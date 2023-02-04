@@ -1,25 +1,68 @@
 import logo from './logo.svg';
+import {Component} from 'react'
 import './App.css';
+import CardList from './components/card-list/card-list.component';
+import SearchBox from './components/search-box/search-box.component';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+class App extends Component {
+
+
+  constructor(){
+      super();
+      this.state = {
+          products : [],
+          searchQuery : ''
+      }
+  }
+
+  componentDidMount(){
+      fetch('https://jsonplaceholder.typicode.com/photos')
+        .then(response => response.json())
+        .then(photos => {
+            this.setState(() => {
+                return {
+                    products : photos
+                }
+            },
+            () => {
+                console.log(this.state);
+            }
+            )
+        })
+  }
+
+  onSearchChange = 
+                (event) => {
+                    const searchQuery = event.target.value.toLowerCase();
+                    this.setState(
+                        () => {
+                            return { searchQuery}
+                        },
+                        () => {}
+
+                    )
+                }
+   
+  render(){
+        
+      const {products, searchQuery} = this.state;
+      const {onSearchChange} = this;
+      const filtered = products.filter(product => {
+            return product.title.toLowerCase().includes(searchQuery);
+      });
+
+	  return (
+	    <div className="App">
+          <SearchBox
+            className='product-search-box'
+            placeholder='search title'
+            onChangeHandler={onSearchChange}/>
+          <CardList list={filtered}/>
+	    </div>
+	  );
+  }
+
+
 }
 
 export default App;
